@@ -88,3 +88,47 @@ python train.py --n_embd=1024 --mup_width_multiplier=4.0
 On startup, `train.py` runs a coordinate check to verify muP is working correctly.
 It trains briefly at width 1x and 2x and checks that the logit delta std is
 width-invariant (ratio between 0.5 and 2.0 = PASS).
+-- Coordinate Check (std of logit delta across widths) -----------
+width_mult=1.0 n_embd=256 | std(delta_logit) after 10 steps = 0.03241
+width_mult=2.0 n_embd=512 | std(delta_logit) after 10 steps = 0.03198
+ratio (2x/1x width) = 0.987 -> PASS
+
+---
+
+## Results
+
+### Validation Loss — All Widths
+![Validation Loss](mup_width_comparison_val.png)
+
+### Validation Loss — Zoomed Out
+![Validation Loss Zoomed Out](mup_width_comparison_val_zoomed_out.png)
+
+### Train Loss — All Widths
+![Train Loss](mup_width_comparison_train.png)
+
+### Train Loss — Zoomed Out
+![Train Loss Zoomed Out](mup_width_comparison_train_zoomed_out.png)
+
+### Diagnostic — Log X Scale
+![Diagnostic Log X](mup_width_comparison_diagnostic_logx.png)
+
+---
+
+## Key Config Parameters
+
+| Parameter | Default | Description |
+|---|---|---|
+| `mup_enabled` | `True` | Enable muP parametrization |
+| `mup_width_multiplier` | `1.0` | `n_embd / base_width (256)` |
+| `mup_input_alpha` | `1.0` | Tunable input embedding multiplier |
+| `mup_output_alpha` | `1.0` | Tunable output unembedding multiplier |
+| `mup_disable_attention_scaling` | `False` | Use standard `1/sqrt(d)` instead |
+| `mup_disable_hidden_lr_scaling` | `False` | Disable per-layer LR scaling |
+
+---
+
+## References
+
+- [muP paper: Tensor Programs V](https://arxiv.org/abs/2203.03466)
+- [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT) — base codebase
+- [Wikitext-103 dataset](https://huggingface.co/datasets/Salesforce/wikitext)
